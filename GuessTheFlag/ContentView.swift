@@ -7,6 +7,16 @@
 
 import SwiftUI
 
+struct FlagImage: View {
+    var country: String
+    
+    var body: some View {
+        Image(country)
+            .clipShape(.capsule)
+            .shadow(radius: 5)
+    }
+}
+
 struct ContentView: View {
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Spain", "UK", "Ukraine", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
@@ -46,9 +56,7 @@ struct ContentView: View {
                         Button {
                             flagTapped(number)
                         } label: {
-                            Image(countries[number])
-                                .clipShape(.capsule)
-                                .shadow(radius: 5)
+                            FlagImage(country: countries[number])
                         }
                         
                     }
@@ -63,6 +71,9 @@ struct ContentView: View {
                 Text("Score: \(score)")
                     .foregroundStyle(.white)
                     .font(.title.bold())
+                Text("Round: \(rounds)")
+                    .foregroundStyle(.white)
+                    .font(.title.bold())
                 Spacer()
             }
             .alert(scoreTitle, isPresented: $showingScore) {
@@ -74,9 +85,10 @@ struct ContentView: View {
                     Text("Wrong, that's \(countries[chosenIndex]) flag")
                 }
             }
-            .padding()
-            .alert("Game ended", isPresented: $endGame) {
+            .alert("Game over", isPresented: $endGame) {
                 Button("Restart", action: resetGame)
+            } message: {
+                Text("Your score is \(score) out of \(rounds)")
             }
         }
         
@@ -91,12 +103,13 @@ struct ContentView: View {
         }
         showingScore = true
         rounds += 1
-        if rounds == 8 {
-            endGame = true
-        }
+        
     }
     
     func askQuestion() {
+        if rounds == 8 {
+            endGame = true
+        }
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }
